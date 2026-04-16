@@ -32,6 +32,11 @@ The game is built using a simple game loop:
 
 ---
 
+Files
+assets/ # all the sprites and assets
+main.py # main application
+requirments.txt
+
 ## Requirements
 Make sure you have Python installed:
 
