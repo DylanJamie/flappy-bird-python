@@ -13,23 +13,30 @@ Y = 700
 screen        = pygame.display.set_mode((X, Y))
 clock         = pygame.time.Clock()
 
+# Load all the needed images
+pipe_image = pygame.image.load('./assets/pipe.png').convert_alpha()
+bird_image = pygame.image.load('./assets/bird.png').convert_alpha()
+background_image = pygame.image.load('./assets/background_sprite.png').convert()
+
+# Scale the images
+bird_image = pygame.transform.scale(bird_image, (40, 30)) 
+pipe_surface_bottom = pygame.transform.scale(pipe_image, (70, 500))
+pipe_surface_top = pygame.transform.flip(pipe_surface_bottom, False, True)
+
 # Game Variables
 gravity       = 0.25
 bird_movement = 0
 game_active   = True
 
 # Create a Rectangle for the bird (x, y, width, height)
-bird_rect = pygame.Rect(100, 350, 30, 30) 
+bird_rect = bird_image.get_rect(center = (100, 350)) 
 init_score = 0
 # keep track of which pipes have counted as a score
 scored_pipes = []
 
 # Colors
-sky_blue = (135, 206, 235)
-yellow   = (255, 255,   0)
 black    = (0,     0,   0)
 white    = (255, 255, 255)
-green    = (80,  200, 120)
 
 # create a font object.
 # 1st parameter is the font file
@@ -71,7 +78,7 @@ while True:
             if event.key == pygame.K_SPACE:
                 if game_active:
                     bird_movement  = 0
-                    bird_movement -= 8
+                    bird_movement -= 7
                 else:
                     game_active = True
                     bird_rect.center = (100, 350)
@@ -84,8 +91,8 @@ while True:
             # Bottom and top pipes with subtraction
             # For top price if we have 400 for 'random_pipe_position'
             # 400 - 150 = 250 and then since pygame draws from top-left 250 - 500 = -250
-            bottom_pipe = pygame.Rect(500, random_pipe_position, 50, 500)
-            top_pipe    = pygame.Rect(500, random_pipe_position - gap_between_pipes - 500, 50, 500)
+            bottom_pipe = pygame.Rect(500, random_pipe_position, 70, 500)
+            top_pipe    = pygame.Rect(500, random_pipe_position - gap_between_pipes - 500, 70, 500)
 
             pipe_list.append(bottom_pipe)
             pipe_list.append(top_pipe)
@@ -97,11 +104,11 @@ while True:
         # Game Logic
         bird_movement += gravity
         bird_rect.centery += bird_movement 
-        # Update
-        # Rendering
-        screen.fill(sky_blue)
+
+        # Implement the background image 
+        screen.blit(background_image, (0,0))
         # Draw the bird
-        pygame.draw.rect(screen, yellow, bird_rect)
+        screen.blit(bird_image, bird_rect)
             
         # Render the Init_Score text
         score_text = font.render(f"{init_score}", True, white)
@@ -118,15 +125,21 @@ while True:
 
         # Add a speed multiplier for pipes
         speed_multiplier = 1 + (seconds * 0.01)
-        print(speed_multiplier)
         
         # Pipe Logic
         for pipe in pipe_list:
             # Move the pipe to the left
             pipe.centerx -= 2 * speed_multiplier
-            # Draw the pipe
-            pygame.draw.rect(screen, green, pipe)
-            
+
+            # flipping the pipe sprite
+            # Top pipe
+            if pipe.top < 0:
+                # Draw flipped pipe
+                screen.blit(pipe_surface_bottom, pipe)
+            else:
+                # Draw the pipe
+                screen.blit(pipe_surface_top, pipe)
+        
             # Update score
             if pipe.top > 0:
                 if bird_rect.left >= pipe.right:
@@ -150,7 +163,10 @@ while True:
             # If the Pipe is still on the screen keep it
             if pipe.right > -50:
                 remaining_pipes.append(pipe)
-
+            else:
+                if pipe in scored_pipes:
+                    scored_pipes.remove(pipe)
+                
         # over write the list with an updated one
         pipe_list = remaining_pipes
         # Conclude memory clean up
