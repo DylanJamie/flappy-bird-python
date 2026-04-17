@@ -46,6 +46,13 @@ spawn_pipe = pygame.USEREVENT
 pygame.time.set_timer(spawn_pipe, pipe_time)
 pipe_height = [300, 400, 500]
 
+# Clock to start the game
+timer_event = pygame.USEREVENT + 1
+timer_start = 0.0
+# Start timer for 1000 ms to a 1 sec
+pygame.time.set_timer(timer_event, 1000)
+start_ticks = pygame.time.get_ticks()
+
 # Updating the collisions function
 def check_collisions(pipes):
     for pipe in pipes:
@@ -84,9 +91,12 @@ while True:
             pipe_list.append(top_pipe)
 
     if game_active:
+        # Calculate the time
+        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+        
         # Game Logic
         bird_movement += gravity
-        bird_rect.centery += bird_movement
+        bird_rect.centery += bird_movement 
         # Update
         # Rendering
         screen.fill(sky_blue)
@@ -105,11 +115,15 @@ while True:
 
         # Draw the Score on the Game
         screen.blit(score_text, score_textRect)
+
+        # Add a speed multiplier for pipes
+        speed_multiplier = 1 + (seconds * 0.01)
+        print(speed_multiplier)
         
         # Pipe Logic
         for pipe in pipe_list:
             # Move the pipe to the left
-            pipe.centerx -= 5
+            pipe.centerx -= 2 * speed_multiplier
             # Draw the pipe
             pygame.draw.rect(screen, green, pipe)
             
@@ -168,6 +182,9 @@ while True:
         # clear the scored pipe list
         scored_pipes.clear()
 
+        # Reset the timer for the next game
+        start_ticks = pygame.time.get_ticks()
+        
     # Frame Rate
     pygame.display.update()
     clock.tick(120)
