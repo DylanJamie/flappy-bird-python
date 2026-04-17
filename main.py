@@ -17,6 +17,7 @@ clock         = pygame.time.Clock()
 gravity       = 0.25
 bird_movement = 0
 game_active   = True
+
 # Create a Rectangle for the bird (x, y, width, height)
 bird_rect = pygame.Rect(100, 350, 30, 30) 
 init_score = 0
@@ -26,6 +27,7 @@ sky_blue = (135, 206, 235)
 yellow   = (255, 255,   0)
 black    = (0,     0,   0)
 white    = (255, 255, 255)
+green    = (80,  200, 120)
 
 # create a font object.
 # 1st parameter is the font file
@@ -33,18 +35,21 @@ white    = (255, 255, 255)
 # 2nd parameter is size of the font
 font = pygame.font.Font('./assets/ARCADECLASSIC.TTF', 32)
 
-# Asset Loading where we can load in the assets from the assets folder
-# bird_surface = pygame.image.load('assets/bird.png').convert()
-# bg_surface   = pygame.image.load('assets/bg.png').convert()
+# Draw the pipes
+# make a list for the pipes and have a new pipe spawn in every 1.2 sec
+# Make the pipe height random between any of the listed heights
+pipe_list = []
+pipe_time = 1200
+spawn_pipe = pygame.USEREVENT
+pygame.time.set_timer(spawn_pipe, pipe_time)
+pipe_height = [300, 400, 500]
 
-# # Game Function
-# def draw_pipes(pipes):
-#     for pipe in pipes: # might switch to while
-#         # Draw pipes
-#         pass
-
-# Check if the bird has collided with the pipe
-def check_collision(pipes):
+# Updating the collisions function
+def check_collisions(pipes):
+    for pipe in pipes:
+        # If the bird colides with the pipe return false
+        if bird_rect.colliderect(pipe):
+            return False
     return True
 
 # main game loop
@@ -62,6 +67,11 @@ while True:
                     game_active = True
                     bird_rect.center = (100, 350)
                     bird_movement  = 0
+        if event.type == spawn_pipe:
+            random_pipe_position = random.choice(pipe_height)
+            # Create a new pipe to try and effect the player
+            new_pipe = pygame.Rect(500, random_pipe_position, 50, 500)
+            pipe_list.append(new_pipe)
 
     if game_active:
         # Game Logic
@@ -93,6 +103,29 @@ while True:
         # Check if the bird hit the top or bottom of the screen
         if bird_rect.top <= 0 or bird_rect.bottom >= 700:
             game_active = False
+
+        # Pipe Logic
+        for pipe in pipe_list:
+            # Move the pipe to the left
+            pipe.centerx -= 5
+            # Draw the pipe
+            pygame.draw.rect(screen, green, pipe)
+
+        # Remove pipe that goes off the screen to save memory
+        # Create a temp list
+        remaining_pipes = []
+
+        # loop throught the current pipes
+        for pipe in pipe_list:
+            # If the Pipe is still on the screen keep it
+            if pipe.right > -50:
+                remaining_pipes.append(pipe)
+
+        # over write the list with an updated one
+        pipe_list = remaining_pipes
+        # Conclude memory clean up
+
+        
     else:
         # this is an RGB Color | RED
         screen.fill((200, 0, 0))
