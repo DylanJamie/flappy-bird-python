@@ -24,7 +24,6 @@ init_score = 0
 # keep track of which pipes have counted as a score
 scored_pipes = []
 
-
 # Colors
 sky_blue = (135, 206, 235)
 yellow   = (255, 255,   0)
@@ -73,8 +72,16 @@ while True:
         if event.type == spawn_pipe:
             random_pipe_position = random.choice(pipe_height)
             # Create a new pipe to try and effect the player
-            new_pipe = pygame.Rect(500, random_pipe_position, 50, 500)
-            pipe_list.append(new_pipe)
+            gap_between_pipes = 150
+
+            # Bottom and top pipes with subtraction
+            # For top price if we have 400 for 'random_pipe_position'
+            # 400 - 150 = 250 and then since pygame draws from top-left 250 - 500 = -250
+            bottom_pipe = pygame.Rect(500, random_pipe_position, 50, 500)
+            top_pipe    = pygame.Rect(500, random_pipe_position - gap_between_pipes - 500, 50, 500)
+
+            pipe_list.append(bottom_pipe)
+            pipe_list.append(top_pipe)
 
     if game_active:
         # Game Logic
@@ -107,10 +114,11 @@ while True:
             pygame.draw.rect(screen, green, pipe)
             
             # Update score
-            if bird_rect.left >= pipe.right:
-                if pipe not in scored_pipes:
-                    init_score += 1
-                    scored_pipes.append(pipe)
+            if pipe.top > 0:
+                if bird_rect.left >= pipe.right:
+                    if pipe not in scored_pipes:
+                        init_score += 1
+                        scored_pipes.append(pipe)
 
         # Check for collison
         game_active = check_collisions(pipe_list)
@@ -159,6 +167,7 @@ while True:
         
         # clear the scored pipe list
         scored_pipes.clear()
-        
+
+    # Frame Rate
     pygame.display.update()
     clock.tick(120)
