@@ -8,7 +8,9 @@ import random
 
 # Set up Constants for the game
 pygame.init()
-screen        = pygame.display.set_mode((400, 700))
+X = 400
+Y = 700
+screen        = pygame.display.set_mode((X, Y))
 clock         = pygame.time.Clock()
 
 # Game Variables
@@ -21,6 +23,24 @@ bird_rect = pygame.Rect(100, 350, 30, 30)
 # Colors
 sky_blue = (135, 206, 235)
 yellow   = (255, 255,   0)
+black    = (0,     0,   0)
+
+# create a font object.
+# 1st parameter is the font file
+# which is present in pygame.
+# 2nd parameter is size of the font
+font = pygame.font.Font('./assets/ARCADECLASSIC.TTF', 32)
+
+# create a text surface object,
+# on which text is drawn on it.
+text = font.render('Game Over', True, black)
+
+# create a rectangular object for the
+# text surface object
+textRect = text.get_rect()
+
+# set the center of the rectangular object.
+textRect.center = (X // 2, Y // 2)
 
 # Asset Loading where we can load in the assets from the assets folder
 # bird_surface = pygame.image.load('assets/bird.png').convert()
@@ -68,6 +88,9 @@ while True:
     else:
         # this is an RGB Color | RED
         screen.fill((200, 0, 0))
-    
+
+        # show the game over in the center (Draw on the Text)
+        screen.blit(text, textRect)
+        
     pygame.display.update()
     clock.tick(120)
