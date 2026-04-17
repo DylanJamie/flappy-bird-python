@@ -19,28 +19,19 @@ bird_movement = 0
 game_active   = True
 # Create a Rectangle for the bird (x, y, width, height)
 bird_rect = pygame.Rect(100, 350, 30, 30) 
+init_score = 0
 
 # Colors
 sky_blue = (135, 206, 235)
 yellow   = (255, 255,   0)
 black    = (0,     0,   0)
+white    = (255, 255, 255)
 
 # create a font object.
 # 1st parameter is the font file
 # which is present in pygame.
 # 2nd parameter is size of the font
 font = pygame.font.Font('./assets/ARCADECLASSIC.TTF', 32)
-
-# create a text surface object,
-# on which text is drawn on it.
-text = font.render('Game Over', True, black)
-
-# create a rectangular object for the
-# text surface object
-textRect = text.get_rect()
-
-# set the center of the rectangular object.
-textRect.center = (X // 2, Y // 2)
 
 # Asset Loading where we can load in the assets from the assets folder
 # bird_surface = pygame.image.load('assets/bird.png').convert()
@@ -82,6 +73,23 @@ while True:
         # Draw the bird
         pygame.draw.rect(screen, yellow, bird_rect)
 
+        # Display a score at the top of the game
+        if bird_rect.top <= 400:
+            init_score += 1
+            
+        # Render the Init_Score text
+        score_text = font.render(f"{init_score}", True, white)
+                
+        # create a rectangular object for the
+        # text surface object
+        score_textRect = score_text.get_rect()
+
+        # set the center of the rectangular object.
+        score_textRect.center = (X // 2, 50)
+
+        # Draw the Score on the Game
+        screen.blit(score_text, score_textRect)
+        
         # Check if the bird hit the top or bottom of the screen
         if bird_rect.top <= 0 or bird_rect.bottom >= 700:
             game_active = False
@@ -89,8 +97,22 @@ while True:
         # this is an RGB Color | RED
         screen.fill((200, 0, 0))
 
+        # create a text surface object,
+        # on which text is drawn on it.
+        gameover_text = font.render('Game Over', True, black)
+
+        # create a rectangular object for the
+        # text surface object
+        gameover_textRect = gameover_text.get_rect()
+        
+        # set the center of the rectangular object.
+        gameover_textRect.center = (X // 2, Y // 2)
+        
         # show the game over in the center (Draw on the Text)
-        screen.blit(text, textRect)
+        screen.blit(gameover_text, gameover_textRect)
+
+        # Set the score to 0
+        init_score = 0
         
     pygame.display.update()
     clock.tick(120)
