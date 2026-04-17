@@ -21,6 +21,9 @@ game_active   = True
 # Create a Rectangle for the bird (x, y, width, height)
 bird_rect = pygame.Rect(100, 350, 30, 30) 
 init_score = 0
+# keep track of which pipes have counted as a score
+scored_pipes = []
+
 
 # Colors
 sky_blue = (135, 206, 235)
@@ -82,10 +85,6 @@ while True:
         screen.fill(sky_blue)
         # Draw the bird
         pygame.draw.rect(screen, yellow, bird_rect)
-
-        # Display a score at the top of the game
-        if bird_rect.top <= 400:
-            init_score += 1
             
         # Render the Init_Score text
         score_text = font.render(f"{init_score}", True, white)
@@ -100,17 +99,26 @@ while True:
         # Draw the Score on the Game
         screen.blit(score_text, score_textRect)
         
-        # Check if the bird hit the top or bottom of the screen
-        if bird_rect.top <= 0 or bird_rect.bottom >= 700:
-            game_active = False
-
         # Pipe Logic
         for pipe in pipe_list:
             # Move the pipe to the left
             pipe.centerx -= 5
             # Draw the pipe
             pygame.draw.rect(screen, green, pipe)
+            
+            # Update score
+            if bird_rect.left >= pipe.right:
+                if pipe not in scored_pipes:
+                    init_score += 1
+                    scored_pipes.append(pipe)
 
+        # Check for collison
+        game_active = check_collisions(pipe_list)
+
+        # Check if the bird hit the top or bottom of the screen
+        if bird_rect.top <= 0 or bird_rect.bottom >= 700:
+            game_active = False
+        
         # Remove pipe that goes off the screen to save memory
         # Create a temp list
         remaining_pipes = []
@@ -124,7 +132,6 @@ while True:
         # over write the list with an updated one
         pipe_list = remaining_pipes
         # Conclude memory clean up
-
         
     else:
         # this is an RGB Color | RED
@@ -146,6 +153,12 @@ while True:
 
         # Set the score to 0
         init_score = 0
+
+        # clear the pipe list
+        pipe_list.clear()
+        
+        # clear the scored pipe list
+        scored_pipes.clear()
         
     pygame.display.update()
     clock.tick(120)
