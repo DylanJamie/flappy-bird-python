@@ -43,32 +43,31 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and game_active:
-                bird_movement  = 0
-                bird_movement -= 8
-            if event.key == pygame.K_SPACE and not game_active:
-                game_active = True
+            if event.key == pygame.K_SPACE:
+                if game_active:
+                    bird_movement  = 0
+                    bird_movement -= 8
+                else:
+                    game_active = True
+                    bird_rect.center = (100, 350)
+                    bird_movement  = 0
 
-    # Update the positions
-    # Draw everything
-    # check the collisions
-    # if game_active:
-    #     if check_collision(pipes):
-    #         # the loop will continue but the logic will pause
-    #         game_active = False
-    # else:
-    #     # Show the game over or "PRess Space to restart"
-    #     pass
-            
-    # Game Logic
-    bird_movement += gravity
-    bird_rect.centery += bird_movement
-    # Update
+    if game_active:
+        # Game Logic
+        bird_movement += gravity
+        bird_rect.centery += bird_movement
+        # Update
+        # Rendering
+        screen.fill(sky_blue)
+        # Draw the bird
+        pygame.draw.rect(screen, yellow, bird_rect)
 
-    # Rendering
-    screen.fill(sky_blue)
-    # Draw the bird
-    pygame.draw.rect(screen, yellow, bird_rect)
+        # Check if the bird hit the top or bottom of the screen
+        if bird_rect.top <= 0 or bird_rect.bottom >= 700:
+            game_active = False
+    else:
+        # this is an RGB Color | RED
+        screen.fill((200, 0, 0))
     
     pygame.display.update()
     clock.tick(120)
